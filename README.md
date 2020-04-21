@@ -14,7 +14,7 @@ Once this vulnerabilities are discovered, it aims to inform the user via a REST 
 ## Installation guide
 
 This installation guide is done with a CentOS7 Linux distribution, although installers are provided for Debian based systems.
-The installers can be found at the [documentation page](https://gitlab.com/SourceEye/docs/tree/master/anexo-I).
+The installers can be found at the [releases page](https://github.com/PBarri/source-eye/releases).
 
 ### Install Java
 
