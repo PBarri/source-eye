@@ -1,0 +1,35 @@
+sourceeye: 
+  api: 
+    expose: true
+  analysis: 
+    enabled: true
+    periodicity: "0 0 5 ? * MON-FRI *"
+  nvd: 
+    autoUpdate: true
+    valid-hours: 4
+  github:
+    scanEnabled: false
+  gitlab: 
+    url: "https://gitlab.com"
+    scanEnabled: false
+  localRepository: 
+    scanEnabled: false
+  log: 
+    level: info
+    path: /var/log/source-eye
+    filename: source-eye.log
+    vulnerability: vulnerabilities.log
+    syslog: 
+      enabled: false  
+    
+logging:  file: ${sourceeye.log.path}/${sourceeye.log.filename}
+
+spring:
+  main: 
+    web-environment: ${sourceeye.api.expose:true}
+  datasource:    initialization-mode: NEVER  jpa:
+    open-in-view: false
+  security:    user:      name: ${sourceeye.api.username:admin}
+      password: ${sourceeye.api.password:admin}
+server:  address: ${sourceeye.api.bindAddress:127.0.0.1}
+  port: ${sourceeye.api.port:8080}

@@ -1,0 +1,1 @@
+org.springframework.boot.env.EnvironmentPostProcessor=com.pbarrientos.sourceeye.config.properties.YamlPropertiesPostProcessor

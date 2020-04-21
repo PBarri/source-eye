@@ -1,0 +1,133 @@
+plugins {
+    id 'org.springframework.boot' version '2.0.5.RELEASE'
+	id 'nebula.release' version '6.3.5'
+    id 'org.sonarqube' version '2.6.2'
+    id 'nebula.project' version '4.1.0'
+    id 'nebula.ospackage' version '4.9.3'
+}
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: "org.springframework.boot"
+apply plugin: 'io.spring.dependency-management'
+apply plugin: 'nebula.contacts'
+apply plugin: 'jacoco'
+
+// apply plugin: 'checkstyle'
+
+group = "com.pbarrientos"
+version = "0.1.0"
+
+sourceCompatibility = javaVersion
+targetCompatibility = javaVersion
+
+repositories {
+	mavenLocal()
+	mavenCentral()
+}
+
+contacts {
+	'pablo.barrientos.13@gmail.com' {
+		moniker 'Pablo Barrientos'
+		github 'PBarri'
+	}	
+}
+
+release {
+    // Let the default versioning strategy be the maven style -SNAPSHOT, instead of nebula's devSnapshot
+    defaultVersionStrategy = org.ajoberstar.gradle.git.release.opinion.Strategies.SNAPSHOT
+
+    tagStrategy {
+        generateMessage = { version -> "Create tag for v$version.version" }
+    }
+}
+
+sonarqube {
+    properties { property "sonar.sourceEncoding", "UTF-8" }
+}
+
+javadoc {
+    options {
+        encoding = 'UTF-8'
+        docEncoding = 'UTF-8'
+        charSet = 'UTF-8'
+        linkSource = true
+    }
+    failOnError = false
+}
+
+jacoco {
+    toolVersion = "0.8.1"
+	reportsDir = file("$buildDir/reports/coverage")
+}
+
+jacocoTestReport {
+	reports {
+        html.enabled = true
+        xml.enabled = true
+    	csv.enabled = false
+    }
+	/* Exclude desired packages: Examples provided
+	afterEvaluate {
+		classDirectories = files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: [
+                'com/pbarrientos/sourceeye/data/model/**',
+        	])
+    	})
+	}
+	*/
+}
+
+sourceSets {
+	main {
+		resources {
+			exclude '**/data/**'
+        }
+    }
+}
+
+
+build.dependsOn(jacocoTestReport)
+jacocoTestReport.mustRunAfter(test)
+
+apply from: 'packaging.gradle'
+
+dependencies {
+
+	compile('org.springframework.boot:spring-boot-starter-actuator')
+	compile('org.springframework.boot:spring-boot-starter-batch')
+	compile('org.springframework.boot:spring-boot-starter-web')
+	compile('org.springframework.boot:spring-boot-starter-data-jpa')
+	compile('org.springframework.boot:spring-boot-starter-quartz')
+	compile('org.springframework.boot:spring-boot-starter-logging')
+	compile('org.codehaus.janino:janino')
+	compile('org.springframework.boot:spring-boot-starter-security')
+	compile('org.hibernate.validator:hibernate-validator')
+	compile('org.apache.httpcomponents:httpclient')
+	compile('org.owasp:dependency-check-core:3.3.1')
+	compile('org.owasp:dependency-check-utils:3.3.1')
+	
+	compile('org.apache.maven.shared:maven-invoker:3.0.1')
+	
+	compile('io.springfox:springfox-swagger2:2.9.2')
+	compile('io.springfox:springfox-swagger-ui:2.9.2')
+	
+	compile('com.google.auto.service:auto-service:1.0-rc4')
+	
+	// Gitlab and Github APIs
+	compile('org.gitlab:java-gitlab-api:4.0.0')
+	compile('org.eclipse.mylyn.github:org.eclipse.egit.github.core:2.1.5')
+	
+	runtime('org.mariadb.jdbc:mariadb-java-client')	
+	runtime('com.h2database:h2')
+	runtime('org.springframework.boot:spring-boot-devtools')
+
+	testCompile('org.springframework.boot:spring-boot-starter-test') {
+	    exclude group: 'com.vaadin.external.google', module: 'android-json'
+	}
+
+	testCompile('org.springframework.batch:spring-batch-test')
+	
+	annotationProcessor('org.springframework.boot:spring-boot-configuration-processor')
+
+}

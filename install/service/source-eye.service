@@ -1,0 +1,15 @@
+[Unit]
+Description=Source Eye application
+After=syslog.target
+
+[Service]
+PIDFile=/var/run/sourceeye.pid
+User=sourceeye
+ExecStart=/var/lib/source-eye/bin/source-eye.jar
+SuccessExitStatus=143
+
+# Prevent writes to /usr, /boot, /etc
+ProtectSystem=full
+
+[Install]
+WantedBy=multi-user.target

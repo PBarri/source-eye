@@ -1,0 +1,108 @@
+apply plugin: 'nebula.ospackage'
+apply plugin: 'nebula.ospackage-application-spring-boot'
+
+springBoot {
+	buildInfo()
+}
+
+bootJar {
+	launchScript()
+	mainClassName = 'com.pbarrientos.sourceeye.SourceEyeApplication'
+}
+
+// Task for triggering the creation of the Linux installers
+task distribution (group: "distribution", description: "This task creates the DEB and RPM packages to install the application") {
+	doFirst { println "Creating distribution packages" }
+}
+
+// Task needed for cleanup before executing buildRpm and buildDeb tasks. This is only needed when clean task was not ran
+task cleanInstallers(type: Delete) {
+	delete('build/install')
+}
+
+distribution.dependsOn(javadoc)
+distribution.dependsOn(build)
+distribution.finalizedBy(buildRpm)
+distribution.finalizedBy(buildDeb)
+buildRpm.dependsOn(cleanInstallers)
+buildDeb.dependsOn(cleanInstallers)
+
+// Disable regular jar tasks and script creation, since the script is going to be directly inside the jar
+[jar, startScripts, distTar, distZip, bootStartScripts, bootDistTar, bootDistZip]*.enabled = false
+
+ospackage {
+	packageName = 'source-eye'
+	version = project.version
+	packageDescription = "Source Eye application"
+	
+	os = LINUX
+	type = BINARY
+	arch = NOARCH
+	
+	preInstall file("install/scripts/preInstall.sh")
+    postInstall file("install/scripts/postInstall.sh")
+    preUninstall file("install/scripts/preUninstall.sh")
+    postUninstall file("install/scripts/postUninstall.sh")
+	
+	into "/var/lib/source-eye" 
+	user "sourceeye"
+	permissionGroup "sourceeye"	
+	
+	from (bootJar.outputs.files) {
+		rename { String filename -> filename.replace("-${project.version}", "") }
+		fileMode 0500
+		into "bin"
+	}
+	
+	from ("install/conf") {
+		fileType CONFIG | NOREPLACE
+		fileMode 0600
+		into "conf"
+	}
+	
+	from ("install/service") {
+		user "root"
+		permissionGroup "root"
+      	fileMode 0500
+      	into "/etc/systemd/system/"
+     }
+     
+     from ("install/sql") {
+       	into "scripts"   
+     }
+
+}
+
+ospackage_application {
+    prefix = '/var/lib/source-eye'
+}
+
+buildRpm {
+	user "sourceeye"
+	permissionGroup "sourceeye"
+	
+	// Create log file
+	directory("/var/log/source-eye", 0755)
+	
+	// Create a symlink to the configuration file because Spring Boot expects the configuration file to be there
+	//TODO: Change this in the launch script
+	link("/var/lib/source-eye/bin/source-eye.conf", "/var/lib/source-eye/conf/source-eye.conf")
+	
+	// Create a link for init.d
+	// link("/etc/init.d/source-eye", "/var/lib/source-eye/bin/source-eye.jar")
+}
+
+buildDeb {
+	user "sourceeye"
+	permissionGroup "sourceeye"
+	
+	// Create log file
+	directory("/var/log/source-eye", 0755)
+	
+	// Create a symlink to the configuration file because Spring Boot expects the configuration file to be there
+	//TODO: Change this in the launch script
+	link("/var/lib/source-eye/bin/source-eye.conf", "/var/lib/source-eye/conf/source-eye.conf")
+	
+	// Create a link for init.d
+	link("/etc/init.d/source-eye", "/var/lib/source-eye/bin/source-eye.jar")
+}

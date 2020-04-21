@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+	<include resource="org/springframework/boot/logging/logback/base.xml" />
+
+	<springProperty name="LOG_LEVEL" source="sourceeye.log.level" />
+	<springProperty name="LOG_PATH" source="sourceeye.log.path" />
+	<springProperty name="LOG_FILENAME" source="sourceeye.log.filename" />
+	<springProperty name="LOG_VULN_FILENAME" source="sourceeye.log.vulnerability" />
+	<springProperty name="SYSLOG_ENABLED" source="sourceeye.log.syslog.enabled" />
+	<springProperty name="SYSLOG_ADDRESS" source="sourceeye.log.syslog.address" />
+	<springProperty name="SYSLOG_PORT" source="sourceeye.log.syslog.port" />
+
+	<appender name="VULNERABILITIES_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${LOG_PATH}/${LOG_VULN_FILENAME}</file>
+
+		<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+			<Pattern>%msg%n</Pattern>
+		</encoder>
+
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${LOG_PATH}/archived/${LOG_VULN_FILENAME}_%d{yyyy-MM-dd}.gz</fileNamePattern>
+			<maxHistory>30</maxHistory>
+		</rollingPolicy>
+	</appender>
+
+	<root level="${LOG_LEVEL}">
+		<appender-ref ref="CONSOLE" />
+		<appender-ref ref="FILE" />
+	</root>
+
+	<if condition='property("SYSLOG_ENABLED").equals("true")'>
+		<then>
+			<appender name="SYSLOG_APPENDER" class="ch.qos.logback.classic.net.SyslogAppender">
+				<syslogHost>${SYSLOG_ADDRESS}</syslogHost>
+				<facility>SYSLOG</facility>
+				<port>${SYSLOG_PORT}</port>
+				<suffixPattern>%msg</suffixPattern>
+			</appender>
+
+			<logger name="com.pbarrientos.sourceeye.engine.SourceEyeEngineLogger" level="INFO">
+				<appender-ref ref="SYSLOG_APPENDER" />
+				<appender-ref ref="VULNERABILITIES_LOG" />
+			</logger>
+		</then>
+		<else>
+			<logger name="com.pbarrientos.sourceeye.engine.SourceEyeEngineLogger" level="INFO">
+				<appender-ref ref="VULNERABILITIES_LOG" />
+			</logger>
+		</else>
+	</if>
+
+</configuration>

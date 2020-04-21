@@ -1,0 +1,83 @@
+###################################################################################################################
+###################################################################################################################
+###                                                                                                             ###
+###                                                                                                             ###
+###       _______.  ______    __    __  .______        ______  _______           ___________    ____  _______   ###
+###      /       | /  __  \  |  |  |  | |   _  \      /      ||   ____|         |   ____\   \  /   / |   ____|  ###
+###     |   (----`|  |  |  | |  |  |  | |  |_)  |    |  ,----'|  |__            |  |__   \   \/   /  |  |__     ###
+###      \   \    |  |  |  | |  |  |  | |      /     |  |     |   __|           |   __|   \_    _/   |   __|    ###
+###  .----)   |   |  `--'  | |  `--'  | |  |\  \----.|  `----.|  |____          |  |____    |  |     |  |____   ###
+###  |_______/     \______/   \______/  | _| `._____| \______||_______|         |_______|   |__|     |_______|  ###
+###                                                                                                             ###
+###  Configuration File.                                                                                        ###
+###                                                                                                             ###
+###                                                                                                             ###
+###################################################################################################################
+###################################################################################################################
+
+sourceeye: 
+# Properties related to the analysis process.
+#  analysis: 
+#    enabled: true  # If this analysis should be done in an automatic way
+#    periodicity: "0 0 5 ? * MON-FRI *"  # Cron expression. By default, each business day at 5:00 AM
+
+# Properties related to the synchronization with NVD database
+#  nvd: 
+#    autoUpdate: true # If updates are applied automatically
+#    valid-hours: 4 # Interval of time before check again for updates
+
+# Database connection properties. This setting MUST be fulfilled by the user with a valid connection.
+# Initialization script of the database can be found in /var/lib/source-eye/scripts/initialize_database-mysql.sql
+#  database: 
+#    connection: jdbc:mariadb://localhost:3306/sourceeye
+#    driver-class-name: org.mariadb.jdbc.Driver
+#    username: db-username
+#    password: db-password
+
+# Properties for connecting with Github API and enable or disable the scanning of projects hosted in Github
+#  github:
+#    scanEnabled: false
+#    username: username
+#    password: password
+
+# Properties for connecting with Gitlab API and enable or disable the scanning of projects hosted in Gitlab
+#  gitlab: 
+#    scanEnabled: false
+#    username: username
+#    password: password
+#    apiToken: token
+
+# Properties for connecting with a local repository and enable or disable the scanning of those projects.
+#  localRepository: 
+#    scanEnabled: false
+#    path: /path/to/local/repository
+
+# Properties regarding the API
+#  api: 
+#    expose: true # If the API should be created or not
+#    username: admin  # The username to access the API
+#    password: admin  # The password to access the API
+#    bindAddress: 127.0.0.1  # The address to bind the API. By default localhost. Set this to 0.0.0.0 to listen on all interfaces
+#    port: 8080  # The port in which the API will be exposed
+
+# Properties related to logging of Source Eye events
+#  log: 
+#    level: info
+#    path: /var/log/source-eye
+#    filename: source-eye.log
+#    vulnerability: vulnerabilities.log
+#    syslog: 
+#      enabled: false # Enable or disable sending the vulnerabilities log by syslog to a remote server
+#      address: # The server to send the logs
+#      port: # The port in which the remote server syslog is listening to
+
+# Set a proxy in case is needed
+#  proxy: 
+#    host: 
+#    port: 
+#    username: 
+#    password:
+
+# Properties about Maven installation
+#  maven: 
+#    home: # By default, Source Eye will look at the PATH to find maven home. If this is set, this will take precedence over the PATH settings
